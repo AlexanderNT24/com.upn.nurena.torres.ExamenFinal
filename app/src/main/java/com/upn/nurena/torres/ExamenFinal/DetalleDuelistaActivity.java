@@ -4,16 +4,27 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.upn.nurena.torres.ExamenFinal.adapters.CartaAdapter;
+import com.upn.nurena.torres.ExamenFinal.entities.Carta;
+import com.upn.nurena.torres.ExamenFinal.entities.Duelista;
+import com.upn.nurena.torres.ExamenFinal.helpers.DatabaseHelper;
+
+import java.util.ArrayList;
 
 public class DetalleDuelistaActivity extends AppCompatActivity {
 
     private Button btnRegistrarCarta;
     private TextView tvNombreDuelista;
+    private ListView listViewCartas;
+    private CartaAdapter adapter;
 
     private int idDuelista;
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +34,7 @@ public class DetalleDuelistaActivity extends AppCompatActivity {
         // Obtener el ID del duelista de los datos extra del intent
         idDuelista = getIntent().getIntExtra("id", -1);
         tvNombreDuelista = findViewById(R.id.tv_nombre_duelista);
+        listViewCartas = findViewById(R.id.list_view_cartas);
 
         // Obtener el nombre del duelista enviado desde la actividad anterior
         Bundle extras = getIntent().getExtras();
@@ -30,6 +42,7 @@ public class DetalleDuelistaActivity extends AppCompatActivity {
             String nombreDuelista = extras.getString("nombreDuelista");
             tvNombreDuelista.setText(nombreDuelista);
         }
+
         // Inicializar el botón Registrar Carta
         btnRegistrarCarta = findViewById(R.id.btn_registrar_carta);
         btnRegistrarCarta.setOnClickListener(new View.OnClickListener() {
@@ -38,6 +51,14 @@ public class DetalleDuelistaActivity extends AppCompatActivity {
                 abrirRegistrarCartaActivity();
             }
         });
+
+        // Inicializar el DatabaseHelper
+        databaseHelper = new DatabaseHelper(this);
+
+        // Obtener todas las cartas del duelista y mostrarlas en el ListView
+        ArrayList<Carta> cartas = databaseHelper.obtenerCartasDuelista(idDuelista);
+        adapter = new CartaAdapter(this, cartas);
+        listViewCartas.setAdapter(adapter);
     }
 
     private void abrirRegistrarCartaActivity() {
@@ -51,4 +72,3 @@ public class DetalleDuelistaActivity extends AppCompatActivity {
         startActivity(intent);
     }
 }
-

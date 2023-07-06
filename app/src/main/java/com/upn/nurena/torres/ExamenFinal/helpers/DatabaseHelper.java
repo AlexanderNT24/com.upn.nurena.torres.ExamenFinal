@@ -89,7 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String nombre = cursor.getString(cursor.getColumnIndex(COLUMN_NOMBRE));
 
                 Duelista duelista = new Duelista(id, nombre);
-                duelista.setCartas(obtenerCartasDuelista(db, id)); // Obtener las cartas del duelista desde la base de datos
+                duelista.setCartas(obtenerCartasDuelista(id));
 
                 duelistas.add(duelista);
             } while (cursor.moveToNext());
@@ -99,9 +99,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return duelistas;
     }
 
-    private ArrayList<Carta> obtenerCartasDuelista(SQLiteDatabase db, int idDuelista) {
+    public ArrayList<Carta> obtenerCartasDuelista(int idDuelista) {
         ArrayList<Carta> cartas = new ArrayList<>();
 
+        SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_CARTAS + " WHERE " + COLUMN_ID_DUELISTA + " = " + idDuelista, null);
 
         if (cursor.moveToFirst()) {
@@ -114,7 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 double latitud = cursor.getDouble(cursor.getColumnIndex(COLUMN_LATITUD));
                 double longitud = cursor.getDouble(cursor.getColumnIndex(COLUMN_LONGITUD));
 
-                Carta carta = new Carta(idCarta, nombreCarta, 1,puntosAtaque, puntosDefensa, imagen, latitud, longitud);
+                Carta carta = new Carta(idCarta, nombreCarta, 1, puntosAtaque, puntosDefensa, imagen, latitud, longitud);
                 cartas.add(carta);
             } while (cursor.moveToNext());
         }
@@ -122,6 +123,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return cartas;
     }
+
 
 
 }
