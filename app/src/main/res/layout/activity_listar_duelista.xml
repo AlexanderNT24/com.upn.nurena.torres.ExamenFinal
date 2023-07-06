@@ -5,31 +5,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".RegistrarDuelistaActivity">
+    tools:context=".ListarDuelistaActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Registrar Duelista"
+        android:text="Listar Duelistas"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp" />
 
-    <EditText
-        android:id="@+id/et_nombre"
+    <ListView
+        android:id="@+id/list_view_duelistas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nombre del Duelista"
-        android:inputType="textPersonName"
-        android:maxLines="1"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
         android:layout_marginBottom="16dp" />
-
-    <Button
-        android:id="@+id/btn_registrar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Registrar"
-        android:layout_gravity="center" />
 
 </LinearLayout>

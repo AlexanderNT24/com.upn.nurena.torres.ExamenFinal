@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class RegistrarDuelista extends AppCompatActivity {
+public class RegistrarDuelistaActivity extends AppCompatActivity {
 
     private EditText etNombre;
     private Button btnRegistrar;
@@ -35,11 +35,9 @@ public class RegistrarDuelista extends AppCompatActivity {
         String nombre = etNombre.getText().toString().trim();
 
         if (!nombre.isEmpty()) {
-            // Aquí puedes realizar la lógica para registrar al duelista en la base de datos o realizar otras acciones necesarias
             Toast.makeText(this, "Duelista registrado: " + nombre, Toast.LENGTH_SHORT).show();
 
-            // Redireccionar a la actividad DetallesDuelistaActivity
-            Intent intent = new Intent(RegistrarDuelista.this, ListarDuelistasActivity.class);
+            Intent intent = new Intent(RegistrarDuelistaActivity.this, ListarDuelistaActivity.class);
             intent.putExtra("nombreDuelista", nombre); // Puedes pasar datos adicionales a la nueva actividad si es necesario
             startActivity(intent);
         } else {
