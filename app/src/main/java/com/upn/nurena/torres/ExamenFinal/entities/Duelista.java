@@ -9,8 +9,13 @@ public class Duelista {
     private List<Carta> cartas;
 
     public Duelista(int id,String nombre) {
+        this.id = id;
         this.nombre = nombre;
         this.cartas = new ArrayList<>();
+    }
+
+    public void setCartas(List<Carta> cartas) {
+        this.cartas = cartas;
     }
 
     public void agregarCarta(Carta carta) {

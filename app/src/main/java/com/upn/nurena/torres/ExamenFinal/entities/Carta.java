@@ -2,6 +2,7 @@ package com.upn.nurena.torres.ExamenFinal.entities;
 
 public class Carta {
     private int id;
+    private int idDuelista;
     private String nombre;
     private int puntosAtaque;
     private int puntosDefensa;
@@ -9,7 +10,9 @@ public class Carta {
     private double latitud;
     private double longitud;
 
-    public Carta(int id,String nombre, int puntosAtaque, int puntosDefensa, String imagen, double latitud, double longitud) {
+    public Carta(int id,String nombre, int idDuelista, int puntosAtaque, int puntosDefensa, String imagen, double latitud, double longitud) {
+        this.id = id;
+        this.idDuelista = idDuelista;
         this.nombre = nombre;
         this.puntosAtaque = puntosAtaque;
         this.puntosDefensa = puntosDefensa;
