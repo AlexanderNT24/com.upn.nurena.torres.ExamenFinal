@@ -33,4 +33,5 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, ListarDuelistaActivity.class);
         startActivity(intent);
     }
+
 }

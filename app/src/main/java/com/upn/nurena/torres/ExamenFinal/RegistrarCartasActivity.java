@@ -68,8 +68,6 @@ public class RegistrarCartasActivity extends AppCompatActivity {
             public void onLocationChanged(Location location) {
                 latitud = location.getLatitude();
                 longitud = location.getLongitude();
-
-                // Actualiza el texto del TextView con las coordenadas
                 String coordenadas = "Latitud: " + latitud + ", Longitud: " + longitud;
                 tvCoordenadas.setText(coordenadas);
             }
@@ -119,12 +117,8 @@ public class RegistrarCartasActivity extends AppCompatActivity {
 
             long resultado = insertarCartaEnBD(carta);
 
-            if (resultado != -1) {
-                Toast.makeText(this, "Carta registrada exitosamente", Toast.LENGTH_SHORT).show();
-                limpiarCampos();
-            } else {
-                Toast.makeText(this, "Error al registrar la carta", Toast.LENGTH_SHORT).show();
-            }
+            Toast.makeText(this, "Carta registrada exitosamente", Toast.LENGTH_SHORT).show();
+            limpiarCampos();
         } else {
             Toast.makeText(this, "Por favor ingresa todos los datos", Toast.LENGTH_SHORT).show();
         }
@@ -138,12 +132,13 @@ public class RegistrarCartasActivity extends AppCompatActivity {
         values.put("puntos_defensa", carta.getPuntosDefensa());
         values.put("latitud", carta.getLatitud());
         values.put("longitud", carta.getLongitud());
-        // Resto de los campos
 
         return db.insert("cartas", null, values);
     }
 
     private void limpiarCampos() {
+        Intent intent = new Intent(RegistrarCartasActivity.this, ListarDuelistaActivity.class);
+        startActivity(intent);
         etNombreCarta.setText("");
         etPuntosAtaque.setText("");
         etPuntosDefensa.setText("");
@@ -161,16 +156,15 @@ public class RegistrarCartasActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             imagenUri = data.getData();
 
-            Bitmap bitmap = null;
             try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imagenUri);
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
-                Log.d("Bitmap", "Byte Array Length: " + byteArray.length);
+                InputStream inputStream = getContentResolver().openInputStream(imagenUri);
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
             } catch (IOException e) {
                 e.printStackTrace();
+                Toast.makeText(this, "Error al cargar la imagen", Toast.LENGTH_SHORT).show();
             }
+
 
         }
     }
@@ -189,7 +183,7 @@ public class RegistrarCartasActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        return ""; // Devuelve una cadena vacía en caso de error
+        return "";
     }
 
     @Override
