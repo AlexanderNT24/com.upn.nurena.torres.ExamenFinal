@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -10,6 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -20,6 +22,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExamenFinal"
         tools:targetApi="31">
+        <activity
+            android:name=".ListarDuelistasActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegistrarDuelista"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
