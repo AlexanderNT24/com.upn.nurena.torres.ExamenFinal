@@ -51,7 +51,7 @@ public class RegistrarCartasActivity extends AppCompatActivity {
             float puntosAtaque = Float.parseFloat(puntosAtaqueStr);
             float puntosDefensa = Float.parseFloat(puntosDefensaStr);
 
-            Carta carta = new Carta(nombreCarta, puntosAtaque, puntosDefensa);
+            Carta carta = new Carta(1,nombreCarta,2, (int) puntosAtaque, (int) puntosDefensa,"",1,1);
 
             long resultado = insertarCartaEnBD(carta);
 
@@ -67,15 +67,10 @@ public class RegistrarCartasActivity extends AppCompatActivity {
     }
 
     private long insertarCartaEnBD(Carta carta) {
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.COLUMN_NOMBRE, carta.getNombre());
-        values.put(DatabaseHelper.COLUMN_PUNTOS_ATAQUE, carta.getPuntosAtaque());
-        values.put(DatabaseHelper.COLUMN_PUNTOS_DEFENSA, carta.getPuntosDefensa());
-
-        return db.insert(DatabaseHelper.TABLE_CARTAS, null, values);
+        return 1;
     }
+
 
     private void limpiarCampos() {
         etNombreCarta.setText("");

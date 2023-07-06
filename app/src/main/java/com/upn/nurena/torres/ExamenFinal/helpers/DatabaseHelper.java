@@ -25,6 +25,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PUNTOS_ATAQUE = "puntos_ataque";
     private static final String COLUMN_PUNTOS_DEFENSA = "puntos_defensa";
     private static final String COLUMN_ID_DUELISTA = "id_duelista";
+    private static final String COLUMN_IMAGEN = "imagen";
+    private static final String COLUMN_LATITUD = "latitud";
+    private static final String COLUMN_LONGITUD = "longitud";
+
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -110,7 +114,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 double latitud = cursor.getDouble(cursor.getColumnIndex(COLUMN_LATITUD));
                 double longitud = cursor.getDouble(cursor.getColumnIndex(COLUMN_LONGITUD));
 
-                Carta carta = new Carta(idCarta, nombreCarta, puntosAtaque, puntosDefensa, imagen, latitud, longitud);
+                Carta carta = new Carta(idCarta, nombreCarta, 1,puntosAtaque, puntosDefensa, imagen, latitud, longitud);
                 cartas.add(carta);
             } while (cursor.moveToNext());
         }
@@ -118,5 +122,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return cartas;
     }
+
 
 }

@@ -4,8 +4,8 @@ public class Carta {
     private int id;
     private int idDuelista;
     private String nombre;
-    private int puntosAtaque;
-    private int puntosDefensa;
+    private float puntosAtaque;
+    private float puntosDefensa;
     private String imagen;
     private double latitud;
     private double longitud;
@@ -39,7 +39,7 @@ public class Carta {
         this.nombre = nombre;
     }
 
-    public int getPuntosAtaque() {
+    public float getPuntosAtaque() {
         return puntosAtaque;
     }
 
@@ -47,7 +47,7 @@ public class Carta {
         this.puntosAtaque = puntosAtaque;
     }
 
-    public int getPuntosDefensa() {
+    public float getPuntosDefensa() {
         return puntosDefensa;
     }
 
