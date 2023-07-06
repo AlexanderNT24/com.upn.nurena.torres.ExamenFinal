@@ -32,4 +32,5 @@
         android:text="Registrar"
         android:layout_gravity="center" />
 
+
 </LinearLayout>

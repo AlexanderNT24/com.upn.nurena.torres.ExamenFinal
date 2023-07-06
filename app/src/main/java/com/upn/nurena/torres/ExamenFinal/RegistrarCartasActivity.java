@@ -1,20 +1,29 @@
 package com.upn.nurena.torres.ExamenFinal;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.upn.nurena.torres.ExamenFinal.helpers.DatabaseHelper;
 import com.upn.nurena.torres.ExamenFinal.entities.Carta;
@@ -33,20 +42,50 @@ public class RegistrarCartasActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri imagenUri;
-
-
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private double latitud;
+    private double longitud;
+    private TextView tvCoordenadas;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        imageView = findViewById(R.id.imageView);
         setContentView(R.layout.activity_registrar_cartas);
-
+        tvCoordenadas = findViewById(R.id.tv_coordenadas);
         etNombreCarta = findViewById(R.id.et_nombre_carta);
         etPuntosAtaque = findViewById(R.id.et_puntos_ataque);
         etPuntosDefensa = findViewById(R.id.et_puntos_defensa);
         btnRegistrarCarta = findViewById(R.id.btn_registrar_carta);
 
         databaseHelper = new DatabaseHelper(this);
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                latitud = location.getLatitude();
+                longitud = location.getLongitude();
+
+                // Actualiza el texto del TextView con las coordenadas
+                String coordenadas = "Latitud: " + latitud + ", Longitud: " + longitud;
+                tvCoordenadas.setText(coordenadas);
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+            }
+        };
 
         btnRegistrarCarta.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +103,7 @@ public class RegistrarCartasActivity extends AppCompatActivity {
         });
     }
 
+
     private void registrarCarta() {
         String nombreCarta = etNombreCarta.getText().toString().trim();
         String puntosAtaqueStr = etPuntosAtaque.getText().toString().trim();
@@ -75,7 +115,7 @@ public class RegistrarCartasActivity extends AppCompatActivity {
 
             String imagenBase64 = obtenerImagenBase64();
 
-            Carta carta = new Carta(1, nombreCarta, 2, (int) puntosAtaque, (int) puntosDefensa, imagenBase64, 1, 1);
+            Carta carta = new Carta(1, nombreCarta, 2, (int) puntosAtaque, (int) puntosDefensa, imagenBase64, latitud, longitud);
 
             long resultado = insertarCartaEnBD(carta);
 
@@ -91,7 +131,16 @@ public class RegistrarCartasActivity extends AppCompatActivity {
     }
 
     private long insertarCartaEnBD(Carta carta) {
-        return 1;
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("nombre_carta", carta.getNombre());
+        values.put("puntos_ataque", carta.getPuntosAtaque());
+        values.put("puntos_defensa", carta.getPuntosDefensa());
+        values.put("latitud", carta.getLatitud());
+        values.put("longitud", carta.getLongitud());
+        // Resto de los campos
+
+        return db.insert("cartas", null, values);
     }
 
     private void limpiarCampos() {
@@ -111,8 +160,21 @@ public class RegistrarCartasActivity extends AppCompatActivity {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             imagenUri = data.getData();
+
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imagenUri);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                Log.d("Bitmap", "Byte Array Length: " + byteArray.length);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
     }
+
 
     private String obtenerImagenBase64() {
         if (imagenUri != null) {
@@ -130,4 +192,43 @@ public class RegistrarCartasActivity extends AppCompatActivity {
         return ""; // Devuelve una cadena vacía en caso de error
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        iniciarActualizacionesUbicacion();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        detenerActualizacionesUbicacion();
+    }
+
+    private void iniciarActualizacionesUbicacion() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Si los permisos no están concedidos, solicítalos aquí
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+    }
+
+    private void detenerActualizacionesUbicacion() {
+        locationManager.removeUpdates(locationListener);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permiso concedido, inicia las actualizaciones de ubicación
+                iniciarActualizacionesUbicacion();
+            } else {
+                // Permiso denegado, muestra un mensaje o realiza una acción alternativa
+                Toast.makeText(this, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }
