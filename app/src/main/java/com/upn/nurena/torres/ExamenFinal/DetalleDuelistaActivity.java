@@ -16,7 +16,6 @@ public class DetalleDuelistaActivity extends AppCompatActivity {
 
         tvNombreDuelista = findViewById(R.id.tv_nombre_duelista);
 
-        // Obtener el nombre del duelista enviado desde la actividad anterior
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String nombreDuelista = extras.getString("nombreDuelista");

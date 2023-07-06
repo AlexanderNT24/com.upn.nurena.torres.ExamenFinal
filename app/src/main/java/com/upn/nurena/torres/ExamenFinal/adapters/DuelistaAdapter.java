@@ -8,15 +8,16 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.upn.nurena.torres.ExamenFinal.R;
+import com.upn.nurena.torres.ExamenFinal.entities.Duelista;
 
 import java.util.ArrayList;
 
-public class DuelistaAdapter extends ArrayAdapter<String> {
+public class DuelistaAdapter extends ArrayAdapter<Duelista> {
 
-    private ArrayList<String> duelistas;
+    private ArrayList<Duelista> duelistas;
     private Context context;
 
-    public DuelistaAdapter(Context context, ArrayList<String> duelistas) {
+    public DuelistaAdapter(Context context, ArrayList<Duelista> duelistas) {
         super(context, 0, duelistas);
         this.context = context;
         this.duelistas = duelistas;
@@ -28,7 +29,8 @@ public class DuelistaAdapter extends ArrayAdapter<String> {
             convertView = LayoutInflater.from(context).inflate(R.layout.item_duelista, parent, false);
         }
 
-        String nombreDuelista = duelistas.get(position);
+        Duelista duelista = duelistas.get(position);
+        String nombreDuelista = duelista.getNombre();
 
         TextView tvNombreDuelista = convertView.findViewById(R.id.tv_nombre_duelista);
         tvNombreDuelista.setText(nombreDuelista);
@@ -36,3 +38,4 @@ public class DuelistaAdapter extends ArrayAdapter<String> {
         return convertView;
     }
 }
+

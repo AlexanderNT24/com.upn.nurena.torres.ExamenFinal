@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.upn.nurena.torres.ExamenFinal.adapters.DuelistaAdapter;
 import com.upn.nurena.torres.ExamenFinal.entities.Carta;
 import com.upn.nurena.torres.ExamenFinal.entities.Duelista;
+import com.upn.nurena.torres.ExamenFinal.helpers.DatabaseHelper;
 
 import java.util.ArrayList;
 
@@ -20,6 +21,7 @@ public class ListarDuelistaActivity extends AppCompatActivity {
     private ListView listViewDuelistas;
     private ArrayList<Duelista> listaDuelistas;
     private ArrayAdapter<Duelista> adapter;
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,20 +30,12 @@ public class ListarDuelistaActivity extends AppCompatActivity {
 
         listViewDuelistas = findViewById(R.id.list_view_duelistas);
         listaDuelistas = new ArrayList<>();
+        databaseHelper = new DatabaseHelper(this);
 
-        // Ejemplo: Agregar duelistas a la lista
-        Duelista duelista1 = new Duelista("Duelista 1");
-        duelista1.agregarCarta(new Carta("Carta 1", 1000, 800, "imagen1.jpg", 0.0, 0.0));
-        duelista1.agregarCarta(new Carta("Carta 2", 1500, 1200, "imagen2.jpg", 0.0, 0.0));
+        // Obtener la lista de duelistas desde la base de datos
+        listaDuelistas = databaseHelper.getAllDuelistas();
 
-        Duelista duelista2 = new Duelista("Duelista 2");
-        duelista2.agregarCarta(new Carta("Carta 1", 1000, 800, "imagen1.jpg", 0.0, 0.0));
-        duelista2.agregarCarta(new Carta("Carta 2", 1500, 1200, "imagen2.jpg", 0.0, 0.0));
-
-        listaDuelistas.add(duelista1);
-        listaDuelistas.add(duelista2);
-
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaDuelistas);
+        adapter = new DuelistaAdapter(this, listaDuelistas);
         listViewDuelistas.setAdapter(adapter);
 
         // Configurar el listener para el clic en el ListView
@@ -50,10 +44,12 @@ public class ListarDuelistaActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Duelista duelista = listaDuelistas.get(position);
                 Intent intent = new Intent(ListarDuelistaActivity.this, DetalleDuelistaActivity.class);
+                intent.putExtra("id", duelista.getId());
                 intent.putExtra("nombreDuelista", duelista.getNombre());
                 startActivity(intent);
             }
         });
     }
-
 }
+
+

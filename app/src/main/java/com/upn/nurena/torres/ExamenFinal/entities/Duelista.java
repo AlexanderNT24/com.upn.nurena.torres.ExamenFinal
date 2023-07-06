@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Duelista {
+    private int id;
     private String nombre;
     private List<Carta> cartas;
 
-    public Duelista(String nombre) {
+    public Duelista(int id,String nombre) {
         this.nombre = nombre;
         this.cartas = new ArrayList<>();
     }
@@ -23,7 +24,7 @@ public class Duelista {
     public List<Carta> getCartas() {
         return cartas;
     }
-
+    public int getId(){return id;}
 
     public String getNombre() {
         return nombre;

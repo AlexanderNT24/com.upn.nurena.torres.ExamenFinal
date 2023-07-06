@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.upn.nurena.torres.ExamenFinal.helpers.DatabaseHelper;
+
 public class RegistrarDuelistaActivity extends AppCompatActivity {
 
     private EditText etNombre;
@@ -35,13 +37,20 @@ public class RegistrarDuelistaActivity extends AppCompatActivity {
         String nombre = etNombre.getText().toString().trim();
 
         if (!nombre.isEmpty()) {
-            Toast.makeText(this, "Duelista registrado: " + nombre, Toast.LENGTH_SHORT).show();
+            DatabaseHelper databaseHelper = new DatabaseHelper(this);
+            long rowId = databaseHelper.insertDuelista(nombre);
 
-            Intent intent = new Intent(RegistrarDuelistaActivity.this, ListarDuelistaActivity.class);
-            intent.putExtra("nombreDuelista", nombre); // Puedes pasar datos adicionales a la nueva actividad si es necesario
-            startActivity(intent);
+            if (rowId != -1) {
+                Toast.makeText(this, "Duelista registrado: " + nombre, Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(RegistrarDuelistaActivity.this, ListarDuelistaActivity.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Error al registrar el duelista", Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(this, "Por favor ingresa un nombre válido", Toast.LENGTH_SHORT).show();
         }
     }
+
 }
