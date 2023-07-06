@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 public class DetalleDuelistaActivity extends AppCompatActivity {
 
     private Button btnRegistrarCarta;
+    private TextView tvNombreDuelista;
+
     private int idDuelista;
 
     @Override
@@ -20,7 +22,14 @@ public class DetalleDuelistaActivity extends AppCompatActivity {
 
         // Obtener el ID del duelista de los datos extra del intent
         idDuelista = getIntent().getIntExtra("id", -1);
+        tvNombreDuelista = findViewById(R.id.tv_nombre_duelista);
 
+        // Obtener el nombre del duelista enviado desde la actividad anterior
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String nombreDuelista = extras.getString("nombreDuelista");
+            tvNombreDuelista.setText(nombreDuelista);
+        }
         // Inicializar el botón Registrar Carta
         btnRegistrarCarta = findViewById(R.id.btn_registrar_carta);
         btnRegistrarCarta.setOnClickListener(new View.OnClickListener() {
