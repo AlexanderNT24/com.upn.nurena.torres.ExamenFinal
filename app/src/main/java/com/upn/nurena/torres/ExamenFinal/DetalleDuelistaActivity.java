@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.upn.nurena.torres.ExamenFinal.adapters.CartaAdapter;
 import com.upn.nurena.torres.ExamenFinal.entities.Carta;
 import com.upn.nurena.torres.ExamenFinal.entities.Duelista;
-import com.upn.nurena.torres.ExamenFinal.helpers.DatabaseHelper;
+
 
 import java.util.ArrayList;
 
@@ -24,7 +24,7 @@ public class DetalleDuelistaActivity extends AppCompatActivity {
     private CartaAdapter adapter;
 
     private int idDuelista;
-    private DatabaseHelper databaseHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +51,15 @@ public class DetalleDuelistaActivity extends AppCompatActivity {
                 abrirRegistrarCartaActivity();
             }
         });
-
+/*
         // Inicializar el DatabaseHelper
         databaseHelper = new DatabaseHelper(this);
 
         // Obtener todas las cartas del duelista y mostrarlas en el ListView
         ArrayList<Carta> cartas = databaseHelper.obtenerCartasDuelista(idDuelista);
         adapter = new CartaAdapter(this, cartas);
+
+ */
         listViewCartas.setAdapter(adapter);
     }
 

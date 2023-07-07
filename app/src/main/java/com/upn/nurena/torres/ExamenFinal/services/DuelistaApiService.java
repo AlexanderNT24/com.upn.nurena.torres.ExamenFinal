@@ -5,7 +5,7 @@ import retrofit2.Call;
 import retrofit2.http.*;
 
 import java.util.List;
-public interface ApiService {
+public interface DuelistaApiService {
     String url="apiUrl";
 
     @GET(url)

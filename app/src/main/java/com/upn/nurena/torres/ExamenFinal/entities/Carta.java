@@ -1,33 +1,36 @@
 package com.upn.nurena.torres.ExamenFinal.entities;
 
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "cartas", foreignKeys = @ForeignKey(entity = Duelista.class, parentColumns = "id", childColumns = "duelistaId", onDelete = ForeignKey.CASCADE))
 public class Carta {
-    private int id;
-    private int idDuelista;
+    @PrimaryKey(autoGenerate = true)
+    private long id;
     private String nombre;
-    private float puntosAtaque;
-    private float puntosDefensa;
+    private int puntosAtaque;
+    private int puntosDefensa;
     private String imagen;
     private double latitud;
     private double longitud;
+    private long duelistaId;
 
-    public Carta(int id,String nombre, int idDuelista, int puntosAtaque, int puntosDefensa, String imagen, double latitud, double longitud) {
-        this.id = id;
-        this.idDuelista = idDuelista;
+    public Carta(String nombre, int puntosAtaque, int puntosDefensa, String imagen, double latitud, double longitud, long duelistaId) {
         this.nombre = nombre;
         this.puntosAtaque = puntosAtaque;
         this.puntosDefensa = puntosDefensa;
         this.imagen = imagen;
         this.latitud = latitud;
         this.longitud = longitud;
+        this.duelistaId = duelistaId;
     }
 
-    // Getters y setters
-
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -39,7 +42,7 @@ public class Carta {
         this.nombre = nombre;
     }
 
-    public float getPuntosAtaque() {
+    public int getPuntosAtaque() {
         return puntosAtaque;
     }
 
@@ -47,7 +50,7 @@ public class Carta {
         this.puntosAtaque = puntosAtaque;
     }
 
-    public float getPuntosDefensa() {
+    public int getPuntosDefensa() {
         return puntosDefensa;
     }
 
@@ -77,5 +80,13 @@ public class Carta {
 
     public void setLongitud(double longitud) {
         this.longitud = longitud;
+    }
+
+    public long getDuelistaId() {
+        return duelistaId;
+    }
+
+    public void setDuelistaId(long duelistaId) {
+        this.duelistaId = duelistaId;
     }
 }

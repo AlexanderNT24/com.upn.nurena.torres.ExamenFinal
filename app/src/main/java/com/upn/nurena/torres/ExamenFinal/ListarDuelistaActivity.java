@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.upn.nurena.torres.ExamenFinal.adapters.DuelistaAdapter;
 import com.upn.nurena.torres.ExamenFinal.entities.Carta;
 import com.upn.nurena.torres.ExamenFinal.entities.Duelista;
-import com.upn.nurena.torres.ExamenFinal.helpers.DatabaseHelper;
+
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ public class ListarDuelistaActivity extends AppCompatActivity {
     private ListView listViewDuelistas;
     private ArrayList<Duelista> listaDuelistas;
     private ArrayAdapter<Duelista> adapter;
-    private DatabaseHelper databaseHelper;
+    //private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +30,10 @@ public class ListarDuelistaActivity extends AppCompatActivity {
 
         listViewDuelistas = findViewById(R.id.list_view_duelistas);
         listaDuelistas = new ArrayList<>();
-        databaseHelper = new DatabaseHelper(this);
+        //databaseHelper = new DatabaseHelper(this);
 
         // Obtener la lista de duelistas desde la base de datos
-        listaDuelistas = databaseHelper.getAllDuelistas();
+        //listaDuelistas = databaseHelper.getAllDuelistas();
 
         adapter = new DuelistaAdapter(this, listaDuelistas);
         listViewDuelistas.setAdapter(adapter);

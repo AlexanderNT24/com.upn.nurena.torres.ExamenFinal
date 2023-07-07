@@ -25,7 +25,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.upn.nurena.torres.ExamenFinal.helpers.DatabaseHelper;
 import com.upn.nurena.torres.ExamenFinal.entities.Carta;
 
 import java.io.ByteArrayOutputStream;
@@ -39,7 +38,6 @@ public class RegistrarCartasActivity extends AppCompatActivity {
     private EditText etPuntosDefensa;
     private Button btnRegistrarCarta;
 
-    private DatabaseHelper databaseHelper;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri imagenUri;
     private LocationManager locationManager;
@@ -60,7 +58,7 @@ public class RegistrarCartasActivity extends AppCompatActivity {
         etPuntosDefensa = findViewById(R.id.et_puntos_defensa);
         btnRegistrarCarta = findViewById(R.id.btn_registrar_carta);
 
-        databaseHelper = new DatabaseHelper(this);
+
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
@@ -113,9 +111,9 @@ public class RegistrarCartasActivity extends AppCompatActivity {
 
             String imagenBase64 = obtenerImagenBase64();
 
-            Carta carta = new Carta(1, nombreCarta, 2, (int) puntosAtaque, (int) puntosDefensa, imagenBase64, latitud, longitud);
+            //Carta carta = new Carta(1, nombreCarta, 2, (int) puntosAtaque, (int) puntosDefensa, imagenBase64, latitud, longitud);
 
-            long resultado = insertarCartaEnBD(carta);
+            //long resultado = insertarCartaEnBD(carta);
 
             Toast.makeText(this, "Carta registrada exitosamente", Toast.LENGTH_SHORT).show();
             limpiarCampos();
@@ -125,15 +123,8 @@ public class RegistrarCartasActivity extends AppCompatActivity {
     }
 
     private long insertarCartaEnBD(Carta carta) {
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("nombre_carta", carta.getNombre());
-        values.put("puntos_ataque", carta.getPuntosAtaque());
-        values.put("puntos_defensa", carta.getPuntosDefensa());
-        values.put("latitud", carta.getLatitud());
-        values.put("longitud", carta.getLongitud());
 
-        return db.insert("cartas", null, values);
+        return 1;
     }
 
     private void limpiarCampos() {
