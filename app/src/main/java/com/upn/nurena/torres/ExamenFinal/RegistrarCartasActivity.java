@@ -30,6 +30,7 @@ import com.upn.nurena.torres.ExamenFinal.DB.AppDataBase;
 import com.upn.nurena.torres.ExamenFinal.SubirImagenes.RspuestaImagen;
 import com.upn.nurena.torres.ExamenFinal.SubirImagenes.SolicitarImagen;
 import com.upn.nurena.torres.ExamenFinal.entities.Carta;
+import com.upn.nurena.torres.ExamenFinal.services.CartaApiService;
 import com.upn.nurena.torres.ExamenFinal.services.CartaDao;
 import com.upn.nurena.torres.ExamenFinal.services.SubirImagen;
 
@@ -43,7 +44,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RegistrarCartasActivity extends AppCompatActivity implements LocationListener {
+public class RegistrarCartasActivity extends AppCompatActivity {
 
     private EditText etNombreCarta;
     private EditText etPuntosAtaque;
@@ -75,27 +76,47 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
         tvCoordenadas = findViewById(R.id.tv_coordenadas);
 
         //PEDIR PERMISOS DE UBICACION
-        if(
+        if (
                 checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED ||
                         checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-            String[] permissions = new String[] {
+            String[] permissions = new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
             };
             requestPermissions(permissions, 3000);
 
-        }
-        else {
+        } else {
             // configurar frecuencia de actualización de GPS GPSPROMIDER Y NETWORK
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 1, this);
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 1, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    Latitude = location.getLatitude();
+                    Longitude = location.getLongitude();
+
+                    String coordenadas = "Latitud: " + Latitude + ", Longitud: " + Longitude;
+                    tvCoordenadas.setText(coordenadas);
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+                }
+            });
             Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            //Log.i("MAIN_APP: Location - ",  "Latitude: " + location.getLatitude());
-            if(location != null){
-                Log.i("MAIN_APP: Location - ",  "Latitude: " + location.getLatitude());
-            }
-            else {
-                Log.i("MAIN_APP: Location - ",  "Location is null");
+            if (location != null) {
+                Latitude = location.getLatitude();
+                Longitude = location.getLongitude();
+                Log.i("MAIN_APP: Location - ", "Latitude: " + location.getLatitude());
+            } else {
+                Log.i("MAIN_APP: Location - ", "Location is null");
             }
         }
 
@@ -125,15 +146,12 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
         String puntosAtaqueStr = etPuntosAtaque.getText().toString().trim();
         String puntosDefensaStr = etPuntosDefensa.getText().toString().trim();
 
-        if (!nombreCarta.isEmpty() && !puntosAtaqueStr.isEmpty() && !puntosDefensaStr.isEmpty() && imagenUri != null) {
+        if (!nombreCarta.isEmpty() && !puntosAtaqueStr.isEmpty() && !puntosDefensaStr.isEmpty()) {
             int puntosAtaque = Integer.parseInt(puntosAtaqueStr);
             int puntosDefensa = Integer.parseInt(puntosDefensaStr);
 
-            String imagenBase64 = obtenerImagenBase64();
-
-
             // Crear una instancia de la carta con los datos ingresados
-            final Carta carta = new Carta(nombreCarta, puntosAtaque, puntosDefensa, imagenBase64, Latitude, Longitude, duelistaId);
+            final Carta carta = new Carta(nombreCarta, puntosAtaque, puntosDefensa, "", Latitude, Longitude, duelistaId);
 
             // Ejecutar la inserción en un hilo separado utilizando AsyncTask
             new AsyncTask<Void, Void, Long>() {
@@ -150,8 +168,42 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
                 @Override
                 protected void onPostExecute(Long cartaId) {
                     if (cartaId > 0) {
-                        Toast.makeText(RegistrarCartasActivity.this, "Carta registrada exitosamente", Toast.LENGTH_SHORT).show();
-                        limpiarCampos();
+                        // Crear una instancia de Retrofit y del servicio de API de MockAPI
+                        Retrofit retrofit = new Retrofit.Builder()
+                                .baseUrl("https://647879cf362560649a2ddb9c.mockapi.io/") // Reemplazar con la URL base de tu API MockAPI
+                                .addConverterFactory(GsonConverterFactory.create())
+                                .build();
+
+                        CartaApiService apiService = retrofit.create(CartaApiService.class);
+
+                        // Realizar la solicitud para registrar la carta en MockAPI
+                        Call<Carta> call = apiService.createCarta(new Carta(nombreCarta, puntosAtaque, puntosDefensa, "", Latitude, Longitude, duelistaId));
+                        call.enqueue(new Callback<Carta>() {
+                            @Override
+                            public void onResponse(Call<Carta> call, Response<Carta> response) {
+                                if (response.isSuccessful()) {
+                                    // Obtener la carta registrada en MockAPI
+                                    Carta cartaRegistrada = response.body();
+
+                                    // Actualizar la carta en la base de datos local con la información de MockAPI
+                                    cartaRegistrada.setId(cartaId);
+                                    new ActualizarCartaAsyncTask().execute(cartaRegistrada);
+
+                                    // Limpiar los campos y mostrar un mensaje de éxito
+                                    limpiarCampos();
+                                    Toast.makeText(RegistrarCartasActivity.this, "Carta registrada exitosamente", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    // Mostrar un mensaje de error en caso de que el registro haya fallado
+                                    Toast.makeText(RegistrarCartasActivity.this, "Error al registrar la carta en MockAPI", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Carta> call, Throwable t) {
+                                // Mostrar un mensaje de error en caso de que haya ocurrido un error en la solicitud
+                                Toast.makeText(RegistrarCartasActivity.this, "Error al registrar la carta en MockAPI", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     } else {
                         Toast.makeText(RegistrarCartasActivity.this, "Error al registrar la carta", Toast.LENGTH_SHORT).show();
                     }
@@ -161,7 +213,6 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
             Toast.makeText(this, "Por favor ingresa todos los datos", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     private void limpiarCampos() {
         etNombreCarta.setText("");
@@ -176,49 +227,18 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    private class ActualizarCartaAsyncTask extends AsyncTask<Carta, Void, Void> {
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
-            imagenUri = data.getData();
+        @Override
+        protected Void doInBackground(Carta... cartas) {
+            // Obtener la instancia de la base de datos y el DAO correspondiente
+            AppDataBase appDatabase = AppDataBase.getInstance(getApplicationContext());
+            CartaDao cartaDao = appDatabase.cartaDao();
 
-            try {
-                InputStream inputStream = getContentResolver().openInputStream(imagenUri);
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                imageView.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Error al cargar la imagen", Toast.LENGTH_SHORT).show();
-            }
+            // Actualizar la carta en la base de datos local
+            cartaDao.updateCarta(cartas[0]);
+
+            return null;
         }
     }
-
-    private String obtenerImagenBase64() {
-        if (imagenUri != null) {
-            try {
-                InputStream inputStream = getContentResolver().openInputStream(imagenUri);
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
-                byte[] byteArray = byteArrayOutputStream.toByteArray();
-                return Base64.encodeToString(byteArray, Base64.DEFAULT);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return "";
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        Latitude = location.getLatitude();
-        Longitude = location.getLongitude();
-
-        String coordenadas = "Latitud: " + Latitude + ", Longitud: " + Longitude;
-        tvCoordenadas.setText(coordenadas);
-    }
-
 }
-
-

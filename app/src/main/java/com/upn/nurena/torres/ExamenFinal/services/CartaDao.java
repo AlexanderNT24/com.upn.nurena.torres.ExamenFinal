@@ -4,6 +4,8 @@ import com.upn.nurena.torres.ExamenFinal.entities.Carta;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
+
 import java.util.List;
 
 @Dao
@@ -22,4 +24,7 @@ public interface CartaDao {
 
     @Insert
     void insertCartas(List<Carta> cartas);
+
+    @Update
+    void updateCarta(Carta carta);
 }
