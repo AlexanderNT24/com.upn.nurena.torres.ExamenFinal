@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,6 +7,7 @@
     android:paddingTop="16dp"
     android:paddingRight="16dp"
     android:paddingBottom="16dp"
+    android:orientation="vertical"
     tools:context=".DetalleDuelistaActivity">
 
     <TextView
@@ -15,21 +16,23 @@
         android:layout_height="wrap_content"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_alignParentTop="true" />
-
-    <ListView
-        android:id="@+id/list_view_cartas"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_nombre_duelista"
-        android:layout_marginTop="16dp"
-        android:layout_above="@+id/btn_registrar_carta" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp" />
 
     <Button
         android:id="@+id/btn_registrar_carta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="Registrar Carta" />
+        android:layout_gravity="center_horizontal"
+        android:text="Registrar Carta"
+        android:layout_marginBottom="8dp" />
 
-</RelativeLayout>
+    <Button
+        android:id="@+id/btn_ver_cartas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Ver Cartas" />
+
+</LinearLayout>
+

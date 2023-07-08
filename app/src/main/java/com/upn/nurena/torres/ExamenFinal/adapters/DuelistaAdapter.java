@@ -17,6 +17,8 @@ public class DuelistaAdapter extends ArrayAdapter<Duelista> {
     private ArrayList<Duelista> duelistas;
     private Context context;
 
+    private OnDuelistaClickListener clickListener;
+
     public DuelistaAdapter(Context context, ArrayList<Duelista> duelistas) {
         super(context, 0, duelistas);
         this.context = context;
@@ -35,7 +37,25 @@ public class DuelistaAdapter extends ArrayAdapter<Duelista> {
         TextView tvNombreDuelista = convertView.findViewById(R.id.tv_nombre_duelista);
         tvNombreDuelista.setText(nombreDuelista);
 
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (clickListener != null) {
+                    clickListener.onDuelistaClick(duelista);
+                }
+            }
+        });
+
         return convertView;
     }
+
+    public interface OnDuelistaClickListener {
+        void onDuelistaClick(Duelista duelista);
+    }
+
+    public void setOnDuelistaClickListener(OnDuelistaClickListener listener) {
+        this.clickListener = listener;
+    }
 }
+
 

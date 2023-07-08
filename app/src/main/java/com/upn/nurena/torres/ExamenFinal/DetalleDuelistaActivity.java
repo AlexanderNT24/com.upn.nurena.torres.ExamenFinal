@@ -2,29 +2,20 @@ package com.upn.nurena.torres.ExamenFinal;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.upn.nurena.torres.ExamenFinal.adapters.CartaAdapter;
-import com.upn.nurena.torres.ExamenFinal.entities.Carta;
-import com.upn.nurena.torres.ExamenFinal.entities.Duelista;
-
-
-import java.util.ArrayList;
-
 public class DetalleDuelistaActivity extends AppCompatActivity {
 
     private Button btnRegistrarCarta;
+    private Button btnVerCartas;
     private TextView tvNombreDuelista;
-    private ListView listViewCartas;
-    private CartaAdapter adapter;
 
-    private int idDuelista;
-
+    private long idDuelista;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +23,8 @@ public class DetalleDuelistaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detalle_duelista);
 
         // Obtener el ID del duelista de los datos extra del intent
-        idDuelista = getIntent().getIntExtra("id", -1);
+        idDuelista = getIntent().getLongExtra("id", -1);
         tvNombreDuelista = findViewById(R.id.tv_nombre_duelista);
-        listViewCartas = findViewById(R.id.list_view_cartas);
 
         // Obtener el nombre del duelista enviado desde la actividad anterior
         Bundle extras = getIntent().getExtras();
@@ -51,26 +41,37 @@ public class DetalleDuelistaActivity extends AppCompatActivity {
                 abrirRegistrarCartaActivity();
             }
         });
-/*
-        // Inicializar el DatabaseHelper
-        databaseHelper = new DatabaseHelper(this);
 
-        // Obtener todas las cartas del duelista y mostrarlas en el ListView
-        ArrayList<Carta> cartas = databaseHelper.obtenerCartasDuelista(idDuelista);
-        adapter = new CartaAdapter(this, cartas);
-
- */
-        listViewCartas.setAdapter(adapter);
+        // Inicializar el botón Ver Cartas
+        btnVerCartas = findViewById(R.id.btn_ver_cartas);
+        btnVerCartas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verCartas();
+            }
+        });
     }
 
     private void abrirRegistrarCartaActivity() {
+        Log.i("DetalleDuelistaActivity", "ID del Duelista: " + idDuelista);
         // Crear un Intent para abrir la actividad RegistrarCartasActivity
         Intent intent = new Intent(DetalleDuelistaActivity.this, RegistrarCartasActivity.class);
-
         // Pasar el ID del duelista como dato extra al intent
-        intent.putExtra("idDuelista", idDuelista);
+        intent.putExtra("id", idDuelista);
+        // Iniciar la actividad
+        startActivity(intent);
+    }
 
+    private void verCartas() {
+        Log.i("DetalleDuelistaActivity", "Ver Cartas del Duelista: " + idDuelista);
+        // Crear un Intent para abrir la actividad ListarCartasActivity
+        Intent intent = new Intent(DetalleDuelistaActivity.this, ListarCartasActivity.class);
+        // Pasar el ID del duelista como dato extra al intent
+        intent.putExtra("id", idDuelista);
         // Iniciar la actividad
         startActivity(intent);
     }
 }
+
+
+
