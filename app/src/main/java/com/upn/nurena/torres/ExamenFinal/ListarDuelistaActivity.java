@@ -34,6 +34,14 @@ public class ListarDuelistaActivity extends AppCompatActivity implements Duelist
         listViewDuelistas = findViewById(R.id.list_view_duelistas);
         duelistaDao = AppDataBase.getInstance(getApplicationContext()).duelistaDao();
 
+        // Borrar la base de datos
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                duelistaDao.deleteAllDuelistas();
+            }
+        });
+
         // Obtener las cartas registradas desde la base de datos
         obtenerDuelistasRegistrados();
     }
@@ -70,6 +78,7 @@ public class ListarDuelistaActivity extends AppCompatActivity implements Duelist
     }
 
 }
+
 
 
 

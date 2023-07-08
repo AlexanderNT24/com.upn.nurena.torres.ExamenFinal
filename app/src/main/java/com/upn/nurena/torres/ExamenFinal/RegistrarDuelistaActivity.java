@@ -121,19 +121,29 @@ public class RegistrarDuelistaActivity extends AppCompatActivity {
             super.onPostExecute(duelistas);
 
             if (duelistas != null) {
-                // Actualizar la lista de Duelistas en la base de datos local
-                new UpdateDuelistasTask().execute(duelistas);
+                // Eliminar todos los Duelistas de la base de datos local
+                new DeleteDuelistasTask().execute();
+
+                // Insertar los Duelistas obtenidos de MockAPI en la base de datos local
+                new InsertDuelistasTask().execute(duelistas);
             } else {
                 Toast.makeText(RegistrarDuelistaActivity.this, "Error al obtener los Duelistas de MockAPI", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private class UpdateDuelistasTask extends AsyncTask<List<Duelista>, Void, Void> {
+    private class DeleteDuelistasTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            duelistaDao.deleteAllDuelistas();
+            return null;
+        }
+    }
+
+    private class InsertDuelistasTask extends AsyncTask<List<Duelista>, Void, Void> {
         @Override
         protected Void doInBackground(List<Duelista>... lists) {
             List<Duelista> duelistas = lists[0];
-            duelistaDao.deleteAllDuelistas();
             duelistaDao.insertDuelistas(duelistas);
             return null;
         }
@@ -163,6 +173,12 @@ public class RegistrarDuelistaActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        obtenerDuelistas();
+    }
 }
+
 
 
