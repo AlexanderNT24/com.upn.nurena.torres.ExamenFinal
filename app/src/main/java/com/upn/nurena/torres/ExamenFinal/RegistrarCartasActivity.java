@@ -52,8 +52,6 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
 
     private TextView tvCoordenadas;
     private static final int PICK_IMAGE_REQUEST = 1;
-
-    private static final int REQUEST_GALLERY = 2;
     private Uri imagenUri;
     private ImageView imageView;
 
@@ -62,13 +60,7 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
 
     private long duelistaId;
 
-    private Uri selectedImageUri;
-
     private LocationManager mLocationManager;
-
-    private TextView tvimg;
-
-    private String Imagen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +73,6 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
         etPuntosDefensa = findViewById(R.id.et_puntos_defensa);
         btnRegistrarCarta = findViewById(R.id.btn_registrar_carta);
         tvCoordenadas = findViewById(R.id.tv_coordenadas);
-        tvimg = findViewById(R.id.tv_url_imagen);
 
         //PEDIR PERMISOS DE UBICACION
         if(
@@ -113,7 +104,6 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
         duelistaId = intent.getLongExtra("id", -1);
         Log.i("Duelista ID", "ID del Duelista: " + duelistaId);
 
-
         btnRegistrarCarta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,7 +133,7 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
 
 
             // Crear una instancia de la carta con los datos ingresados
-            final Carta carta = new Carta(nombreCarta, puntosAtaque, puntosDefensa, Imagen, Latitude, Longitude, duelistaId);
+            final Carta carta = new Carta(nombreCarta, puntosAtaque, puntosDefensa, imagenBase64, Latitude, Longitude, duelistaId);
 
             // Ejecutar la inserción en un hilo separado utilizando AsyncTask
             new AsyncTask<Void, Void, Long>() {
@@ -182,77 +172,26 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
     }
 
     private void abrirGaleria() {
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(galleryIntent, REQUEST_GALLERY);
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
-            // Obtener la URI de la imagen seleccionada desde la galería
-            selectedImageUri = data.getData();
 
-            // Mostrar un Toast indicando que la imagen se agregó correctamente
-            Toast.makeText(RegistrarCartasActivity.this, "Imagen agregada correctamente", Toast.LENGTH_SHORT).show();
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            imagenUri = data.getData();
 
-            // Obtener la imagen en base64
-            String imageBase64 = convertImageToBase64(selectedImageUri);
-
-            // Subir la imagen a la API
-            uploadImageToApi(imageBase64);
-        }
-    }
-
-    private String convertImageToBase64(Uri imageUri) {
-        try {
-            InputStream inputStream = getContentResolver().openInputStream(imageUri);
-            byte[] imageBytes = new byte[inputStream.available()];
-            inputStream.read(imageBytes);
-            inputStream.close();
-            return Base64.encodeToString(imageBytes, Base64.DEFAULT);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private void uploadImageToApi(String base64Image) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://demo-upn.bit2bittest.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        SubirImagen imageUploadService = retrofit.create(SubirImagen.class);
-
-        SolicitarImagen solicitar = new SolicitarImagen(base64Image);
-
-        Call<RspuestaImagen> call = imageUploadService.uploadImage(solicitar);
-        call.enqueue(new Callback<RspuestaImagen>() {
-            @Override
-            public void onResponse(Call<RspuestaImagen> call, Response<RspuestaImagen> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    RspuestaImagen uploadResponse = response.body();
-                    String imageUrl = uploadResponse.getImageUrl();
-
-                    // Actualizar el campo urlImagen con la imageUrl
-                    tvimg.setText("https://demo-upn.bit2bittest.com/" + imageUrl);
-
-                    Imagen = tvimg.getText().toString();
-
-                } else {
-                    // Mostrar mensaje de error en caso de respuesta no exitosa o cuerpo nulo
-                    Toast.makeText(RegistrarCartasActivity.this, "Error al cargar la imagen", Toast.LENGTH_SHORT).show();
-                }
+            try {
+                InputStream inputStream = getContentResolver().openInputStream(imagenUri);
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                imageView.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Error al cargar la imagen", Toast.LENGTH_SHORT).show();
             }
-
-            @Override
-            public void onFailure(Call<RspuestaImagen> call, Throwable t) {
-                // Mostrar mensaje de error en caso de fallo en la llamada
-                Toast.makeText(RegistrarCartasActivity.this, "Error en la llamada al servidor", Toast.LENGTH_SHORT).show();
-            }
-        });
+        }
     }
 
     private String obtenerImagenBase64() {
@@ -268,7 +207,7 @@ public class RegistrarCartasActivity extends AppCompatActivity implements Locati
                 e.printStackTrace();
             }
         }
-        return null;
+        return "";
     }
 
     @Override

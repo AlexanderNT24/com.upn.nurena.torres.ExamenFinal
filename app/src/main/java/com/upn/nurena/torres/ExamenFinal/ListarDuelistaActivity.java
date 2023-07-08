@@ -38,7 +38,7 @@ public class ListarDuelistaActivity extends AppCompatActivity implements Duelist
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
             public void run() {
-                duelistaDao.deleteAllDuelistas();
+                //duelistaDao.deleteAllDuelistas();
             }
         });
 
